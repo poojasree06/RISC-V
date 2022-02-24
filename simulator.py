@@ -4,7 +4,7 @@ import re
 def remove_comments(file):
     return re.sub('#.*', '', file)
 
-
+#poojaaa
 def data_part(file):
     data_set = []
     pattern = re.compile('\s*[,|\s+]\s*')
