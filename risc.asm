@@ -7,7 +7,6 @@ Arraysize: .byte 6
 .text
  # Commands section of the program
 andi t0, t0, 0 # Clear contents of register t0; Holds array location
-#HI
 andi t1, t1, 0 # Clear contents of register t1; Holds index of inner FOR loop
 andi t3, t3, 0 # Clear contents of register t3; Holds content of current array location
 andi t4, t4, 0 # Clear contents of register t4
