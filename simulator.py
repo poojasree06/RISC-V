@@ -348,4 +348,4 @@ elif (choice == 2):
 
         print('1.Run command || 2.Show registers || 3.Show Memory || 4.exit')
 
-        int_option = int(input())
+        option = int(input())
