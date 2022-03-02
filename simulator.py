@@ -1,12 +1,12 @@
 import re
 
-# instructions=['add','sub,'lw','sw','lui','and','addi','beq','bne']
+# instructions=['add','sub,'lw','sw','lui','and','addi','beq','bne','bge','ble','li']
 
-# add,sub,mul,div   arithmetic              4
-# and,or            boolean                 2
-# lw,sw,lui         memory                  3
-# addi,subi          immediate               2
-# bne,beq            conditional jumps       2
+# add,sub,mul,div   arithmetic               4
+# and,or            boolean                  2
+# lw,sw,lui         memory                   3
+# addi,li         immediate                  2
+# bne,beq,bge,ble  conditional jumps         2
 # j                  unconditional jumps     1
 
 base_address = 0x10010000  # 4KB
@@ -174,6 +174,19 @@ def perform_instructions(instruction, PC):
             j_flag = instruction[1]
             PC = main[j_flag]
 
+    elif instruction[0]=='li':
+        if len(instruction) != 3:
+            print("syntax error at line number %d", PC)
+        else:
+            reg1 = instruction[1]
+            reg2=int(instruction[2])
+            if type(Reg[reg1]) == str and Reg[reg1][0:2] == '0x':
+                Reg[reg1] = hex(int(Reg[reg2], 16))
+            else:
+                Reg[reg1] = reg2
+        print(Reg)
+        PC += 1
+
     elif (instruction[0] == 'addi'):
 
         if len(instruction) != 4:
@@ -184,12 +197,13 @@ def perform_instructions(instruction, PC):
             reg2 = instruction[2]
             addend = int(instruction[3])
             if type(Reg[reg2]) == str and Reg[reg2][0:2] == '0x':
-              #  print(hex(int(Reg[reg2], 16) + addend))
+               # print(hex(int(Reg[reg2], 16) + addend))
                 Reg[reg1] = hex(int(Reg[reg2], 16) + addend)
 
             else:
                 Reg[reg1] = Reg[reg2] + addend
-                PC += 1
+        PC += 1
+
     elif (instruction[0] == 'andi'):
 
         if (len(instruction) != 4):
@@ -292,6 +306,7 @@ if (choice == 1):
     while (PC != len(data_and_text['text']) - 1):
         print(PC)
         count += 1
+        print(data_and_text['text'][PC])
         PC = perform_instructions(data_and_text['text'][PC], PC)
 
         if (PC > len(data_and_text['text'])):
@@ -301,6 +316,7 @@ if (choice == 1):
         print(Registers + ": " + str(Reg[Registers]))
 
     for i in range(len(data['.word'])):
+        print()
         print(hex((base_address + 4 * i)) + ": " + str(data['.word'][i]))
     print(count)
 
