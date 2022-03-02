@@ -43,6 +43,7 @@ def perform_instructions(instruction, PC):
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
         else:
+                     
             reg1 = instruction[1]
             reg2_d=instruction[2].split('(', 1)
             offset=int(reg2_d[0])
