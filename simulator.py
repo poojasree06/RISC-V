@@ -246,7 +246,7 @@ def remove_comments(file):
     return re.sub('#.*', '', file)
 
 
-fileopen = open("programs/riscv3.asm", "r+")
+fileopen = open("RISC-V/s.asm", "r+")
 instructionslist = all_instructions(fileopen)
 
 data_and_text = {'data': [],
