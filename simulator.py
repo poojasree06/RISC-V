@@ -9,12 +9,13 @@ import re
 # bne,beq            conditional jumps       2
 # j                  unconditional jumps     1
 
-base_address = 0x10000000  # 4KB
+base_address = 0x10010000  # 4KB
 PC = 0
 bne_stat = ''
 beq_stat = ''
 j_stat = ''
-
+bge_stat=''
+ble_stat=''
 Reg = {"zero": 0, "ra": 0, "sp": 0, "gp": 0, "tp": 0, "t0": 0, "t1": 0, "t2": 0, "s0": 0, "s1": 0,
        "a0": 0, "a1": 0, "a2": 0, "a3": 0, "a4": 0, "a5": 0, "a6": 0, "a7": 0, "s2": 0, "s3": 0, "s4": 0,
        "s5": 0, "s6": 0, "s7": 0, "s8": 0, "s9": 0, "s10": 0, "s11": 0, "t3": 0, "t4": 0, "t5": 0, "t6": 0}
@@ -39,18 +40,23 @@ def perform_instructions(instruction, PC):
             reg2 = instruction[3]
             Reg[reg0] = Reg[reg1] - Reg[reg2]
             PC += 1
+
     elif instruction[0] == 'lw':
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
         else:
-                     
+
             reg1 = instruction[1]
-            reg2_d=instruction[2].split('(', 1)
-            offset=int(reg2_d[0])
-            reg2=reg2_d[1][:-1]   # string reg name
+            reg2_d = instruction[2].split('(', 1)
+            offset = int(reg2_d[0])
+            reg2 = reg2_d[1][:-1]  # string reg name
+            # print(reg2)
+            # print(Reg[reg2])
             if (int(Reg[reg2], 16) - base_address >= 0 and (
                     int(Reg[reg2], 16) - base_address) % 4 == 0 and offset % 4 == 0):
+                # print(int(Reg[reg2], 16))
                 index = int((int(Reg[reg2], 16) - base_address) / 4 + offset / 4)
+                # print(index)
                 Reg[reg1] = data['.word'][index]  # data???
             PC += 1
 
@@ -60,9 +66,9 @@ def perform_instructions(instruction, PC):
 
         else:
             reg1 = instruction[1]
-            reg2_d=instruction[2].split('(', 1)
-            offset=int(reg2_d[0])
-            reg2=reg2_d[1][:-1]   # string reg name
+            reg2_d = instruction[2].split('(', 1)
+            offset = int(reg2_d[0])
+            reg2 = reg2_d[1][:-1]  # string reg name
             if (int(Reg[reg2], 16) >= base_address and (
                     int(Reg[reg2], 16) - base_address) % 4 == 0 and offset % 4 == 0):
                 index = int((int(Reg[reg2], 16) - base_address) / 4 + offset / 4)
@@ -115,6 +121,33 @@ def perform_instructions(instruction, PC):
             if Reg[reg2] < Reg[reg3]:
                 Reg[reg1] = 1
             PC += 1
+    elif instruction[0] == 'bge':
+
+        if len(instruction) != 4:
+            print("syntax error at line number %d", PC)
+
+        else:
+            reg1 = instruction[1]
+            reg2 = instruction[2]
+            if Reg[reg1] >= Reg[reg2]:
+                bge_stat = instruction[3]
+                PC = main[bge_stat]
+            else:
+                bge_stat=''
+                PC += 1
+
+    elif instruction[0] == 'ble':
+        if len(instruction) != 4:
+            print("syntax error at line number %d", PC)
+        else:
+            reg1 = instruction[1]
+            reg2 = instruction[2]
+            if Reg[reg1] >= Reg[reg2]:
+                ble_stat = instruction[3]
+                PC = main[ble_stat]
+            else:
+                ble_stat=''
+                PC += 1
 
     elif instruction[0] == 'beq':
 
@@ -151,7 +184,9 @@ def perform_instructions(instruction, PC):
             reg2 = instruction[2]
             addend = int(instruction[3])
             if type(Reg[reg2]) == str and Reg[reg2][0:2] == '0x':
+                print(hex(int(Reg[reg2], 16) + addend))
                 Reg[reg1] = hex(int(Reg[reg2], 16) + addend)
+
             else:
                 Reg[reg1] = Reg[reg2] + addend
                 PC += 1
@@ -221,8 +256,8 @@ for i in range(text_index + 1, len(instructionslist)):
 data = {'.word': []}
 count = 0
 for ins in data_and_text['data']:
-    if (ins[0] == '.word'):
-        for i in range(1, len(ins)):
+    if (ins[1] == '.word'):
+        for i in range(2, len(ins)):
             data['.word'].append(int(ins[i]))
             count += 1
 
