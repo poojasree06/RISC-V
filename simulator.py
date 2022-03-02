@@ -184,7 +184,7 @@ def perform_instructions(instruction, PC):
             reg2 = instruction[2]
             addend = int(instruction[3])
             if type(Reg[reg2]) == str and Reg[reg2][0:2] == '0x':
-                print(hex(int(Reg[reg2], 16) + addend))
+              #  print(hex(int(Reg[reg2], 16) + addend))
                 Reg[reg1] = hex(int(Reg[reg2], 16) + addend)
 
             else:
