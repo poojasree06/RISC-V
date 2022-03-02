@@ -43,11 +43,10 @@ def perform_instructions(instruction, PC):
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
         else:
-            reg2_getting = re.search(r"\[a-z0-9]*", instruction[2], re.MULTILINE)  # s0   string
-            offset_getting = re.search(r"\w+", instruction[2], re.MULTILINE)  # 0    string
             reg1 = instruction[1]
-            reg2 = reg2_getting.group(0)
-            offset = int(offset_getting.group(0))
+            reg2_d=instruction[2].split('(', 1)
+            offset=int(reg2_d[0])
+            reg2=reg2_d[1][:-1]   # string reg name
             if (int(Reg[reg2], 16) - base_address >= 0 and (
                     int(Reg[reg2], 16) - base_address) % 4 == 0 and offset % 4 == 0):
                 index = int((int(Reg[reg2], 16) - base_address) / 4 + offset / 4)
@@ -59,11 +58,10 @@ def perform_instructions(instruction, PC):
             print("syntax error at line number %d", PC)
 
         else:
-            reg2_getting = re.search(r"\[a-z0-9]*", instruction[2], re.MULTILINE)
-            offset_getting = re.search(r"\w+", instruction[2], re.MULTILINE)
             reg1 = instruction[1]
-            reg2 = reg2_getting.group(0)
-            offset = int(offset_getting.group(0))
+            reg2_d=instruction[2].split('(', 1)
+            offset=int(reg2_d[0])
+            reg2=reg2_d[1][:-1]   # string reg name
             if (int(Reg[reg2], 16) >= base_address and (
                     int(Reg[reg2], 16) - base_address) % 4 == 0 and offset % 4 == 0):
                 index = int((int(Reg[reg2], 16) - base_address) / 4 + offset / 4)
