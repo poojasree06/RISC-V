@@ -37,7 +37,7 @@ def perform_instructions(instruction, PC):
             elif type(Reg[reg1]) == str and type(Reg[reg2]) == int:
                 Reg[reg0] = hex(int(Reg[reg1], 16) + Reg[reg2])
             elif type(Reg[reg2]) == str and type(Reg[reg1]) == int:
-                Reg[reg1] = hex(int(Reg[reg2], 16) + Reg[reg2])
+                Reg[reg0] = hex(int(Reg[reg2], 16) + Reg[reg1])
             else:
                 Reg[reg0] = Reg[reg1] + Reg[reg2]
             PC += 1
@@ -54,7 +54,7 @@ def perform_instructions(instruction, PC):
             elif type(Reg[reg1]) == str and type(Reg[reg2]) == int:
                 Reg[reg0] = hex(int(Reg[reg1], 16) + Reg[reg2])
             elif type(Reg[reg2]) == str and type(Reg[reg1]) == int:
-                Reg[reg1] = hex(int(Reg[reg2], 16) + Reg[reg2])
+                Reg[reg0] = hex(int(Reg[reg2], 16) + Reg[reg2])
             else:
                 Reg[reg0] = Reg[reg1] - Reg[reg2]
             PC += 1
@@ -310,7 +310,7 @@ for ins in data_and_text['data']:
             data['.word'].append(int(ins[i]))
     elif ins[1] == '.word':
        for i in range(2, len(ins)):
-              data['word'].append(int(ins[i]))
+              data['.word'].append(int(ins[i]))
         # count += 1
 
 main = {}  # dictionary which contains labels as keys and corresponding numbers as values
