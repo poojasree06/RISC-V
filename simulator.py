@@ -142,7 +142,7 @@ def perform_instructions(instruction, PC):
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
-            if Reg[reg1] >= Reg[reg2]:
+            if Reg[reg1] <= Reg[reg2]:
                 ble_stat = instruction[3]
                 PC = main[ble_stat]
             else:
