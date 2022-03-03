@@ -276,7 +276,7 @@ def remove_comments(file):
 
 
 # main program
-fileopen = open("programs/one.s", "r+")
+fileopen = open("programs/example1.asm", "r+")
 instructionslist = all_instructions(fileopen)
 
 data_and_text = {'data': [], 'text': []}
