@@ -280,6 +280,7 @@ fileopen = open("programs/example1.asm", "r+")
 instructionslist = all_instructions(fileopen)
 
 data_and_text = {'data': [], 'text': []}
+label ={'data':[]}          #list containing data section labels
 # dictionary containing two lists data list and text list which contain respective instructions
 data_index = 0
 text_index = 0
@@ -291,7 +292,11 @@ for i in range(len(instructionslist)):
         text_index = i
 
 for i in range(data_index + 1, text_index):
-    data_and_text['data'].append(instructionslist[i])
+    if(len(instructionslist[i])>1):
+         data_and_text['data'].append(instructionslist[i])
+    elif(len(instructionslist[i])==1):
+         label['data'].append(instructionslist[i])
+
 
 for i in range(text_index + 1, len(instructionslist)):
     if instructionslist[i][0] != 'main:':
@@ -300,9 +305,12 @@ for i in range(text_index + 1, len(instructionslist)):
 data = {'.word': []}
 # count = 0
 for ins in data_and_text['data']:
-    if ins[1] == '.word':
-        for i in range(2, len(ins)):
+    if ins[0] == '.word':
+        for i in range(1, len(ins)):
             data['.word'].append(int(ins[i]))
+    elif ins[1] == '.word':
+       for i in range(2, len(ins)):
+              data['word'].append(int(ins[i]))
         # count += 1
 
 main = {}  # dictionary which contains labels as keys and corresponding numbers as values
