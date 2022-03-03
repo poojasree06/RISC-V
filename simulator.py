@@ -7,7 +7,7 @@ import sys
 # and,or                        boolean                   2  -->done
 # lw,sw,lui                     memory                    3  -->done
 # addi,li                       immediate                 2  -->done
-# bne,beq,bge,ble,bgt,blt       conditional jumps         2  -->done
+# bne,beq,bge,ble,bgt           conditional jumps         2  -->done
 # j                             unconditional jumps       1  -->done
 
 base_address = 0x10010000  # 4KB
