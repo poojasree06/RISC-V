@@ -3,7 +3,7 @@ Array: .word 4,3,2,1,6
 
 .text
 main:
-lui a0,0x1000         # we set address of Array[0]
+lui a0,0x10010        # we set address of Array[0]
 li t0,0      # i
 li t1,0      # j
 li t2,5      # n-i
