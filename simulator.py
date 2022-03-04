@@ -28,6 +28,7 @@ def perform_instructions(instruction, PC):
     if instruction[0] == 'add':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg0 = instruction[1]
             reg1 = instruction[2]
@@ -45,6 +46,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'sub':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg0 = instruction[1]
             reg1 = instruction[2]
@@ -62,6 +64,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'lw':
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2_d = instruction[2].split('(', 1)
@@ -79,7 +82,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'sw':
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
-
+            exit()
         else:
             reg1 = instruction[1]
             reg2_d = instruction[2].split('(', 1)
@@ -99,6 +102,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'lui':  # [ 'lui','a0','0x10101'] upper 20bits
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             Reg[reg1] = hex(int(instruction[2] + '000', 16))
@@ -107,6 +111,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'slt':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             Reg[reg1] = 0
@@ -119,6 +124,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'bne':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -128,10 +134,11 @@ def perform_instructions(instruction, PC):
         else:
             bne_stat = ''
             PC += 1
-            
+
     elif instruction[0] == 'bge':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -145,6 +152,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'bgt':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -158,6 +166,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'ble':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -171,6 +180,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'beq':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -185,6 +195,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'slli':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -200,6 +211,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'sll':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -217,6 +229,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'j':
         if len(instruction) != 2:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             j_flag = instruction[1]
             PC = main[j_flag]
@@ -224,6 +237,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'li':
         if len(instruction) != 3:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = int(instruction[2])
@@ -237,6 +251,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'addi':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -252,6 +267,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'andi':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
 
         else:
             reg1 = instruction[1]
@@ -263,6 +279,7 @@ def perform_instructions(instruction, PC):
     elif instruction[0] == 'and':
         if len(instruction) != 4:
             print("syntax error at line number %d", PC)
+            exit()
         else:
             reg1 = instruction[1]
             reg2 = instruction[2]
@@ -287,6 +304,7 @@ def all_instructions(file):
 def remove_comments(file):
     return re.sub('#.*', '', file)
 
+
 def show_registers():
     i = 0
     print()
@@ -302,13 +320,12 @@ def show_memory():
         print(hex((base_address + 4 * i)) + ": " + str(data['.word'][i]))
     print()
 
-# main program
 
+# main program
 text_address = 0x00000000
 text_memory = ['' for i in range(2048)]
-base_memory = 0 * [2048]
 
-fileopen = open("programs/example1.asm", "r+")
+fileopen = open("programs/s.asm", "r+")
 instructionslist = all_instructions(fileopen)
 
 data_and_text = {'data': [], 'text': []}
@@ -340,11 +357,9 @@ for ins in data_and_text['data']:
     if ins[0] == '.word':
         for i in range(1, len(ins)):
             data['.word'].append(int(ins[i]))
-            base_memory.append(int(ins[i]))
     elif ins[1] == '.word':
         for i in range(2, len(ins)):
             data['.word'].append(int(ins[i]))
-            base_memory.append(int(ins[i]))   #b
         # count += 1
 
 main = {}  # dictionary which contains labels as keys and corresponding numbers as values
@@ -372,7 +387,6 @@ print(Reg)  # prints Reg list
 print(data['.word'])  # prints elements of array
 print(data_and_text['data'])
 print(main)  # prints labels inside text part after main
-
 print("\nPress 1 to RUN file")
 print("Press 2 to RUN step by step")
 print("Press 3 to Exit")
