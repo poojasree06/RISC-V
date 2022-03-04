@@ -325,7 +325,7 @@ def show_memory():
 text_address = 0x00000000
 text_memory = ['' for i in range(2048)]
 
-fileopen = open("programs/s.asm", "r+")
+fileopen = open("instructions.s", "r+")
 instructionslist = all_instructions(fileopen)
 
 data_and_text = {'data': [], 'text': []}
