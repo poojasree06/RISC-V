@@ -25,8 +25,8 @@
 * Simulator supports atleast 4KB of memory
 * The developed simulator reads in assembly file(.s file).
 * There are two execution modes supported:
-* Execution Mode - The program will execute all the instructions, and display the state of the registers and memory after executing all instructions.
-* Step by Step Mode - The program will run one instruction at a time.The next instruction will be executed only when the user presses a key.
+   - Execution Mode - The program will execute all the instructions, and display the state of the registers and memory after executing all instructions.
+   - Step by Step Mode - The program will run one instruction at a time.The next instruction will be executed only when the user presses a key.
 
 # Guidelines
 * The assembly program can contain .data and .text sections. There should be no text, apart from comments or blank lines, between the two sections
@@ -34,7 +34,7 @@
 * When referring to a register, they must be referred to by their ABI names.Only ABI names are supported.
 * A line containing a label may not contain any other instruction.
 * Any memory element created in the data section is assigned an address starting from 0x10010000
-* Except in displaying the address, all values used use the decimal number system.
+* Except in displaying the address, all values uses decimal number system.
 * ---?
 * Comments are supported
 
