@@ -13,10 +13,10 @@
 ```Arithmetic instructions --> add , sub , addi
 >  Arithmetic instructions --> add , sub , addi
 >      Memory instructions --> lw , sw
->     Logical instructions --> and , and
+>     Logical instructions --> and , andi
 >      Branch instructions --> bne , beq , bge , bgt , ble
 >        Jump instructions --> j
->       Shift instructions --> slli
+>       Shift instructions --> slli, sll
 >         Set instructions --> slt
 >       pseudo instruction --> li
 >          lui instruction --> loads upper 20 bits into register
