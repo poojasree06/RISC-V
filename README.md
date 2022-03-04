@@ -39,4 +39,6 @@
 * Comments are supported
 
 # How to use it
+* Download the zip file
+* Paste your assembly code into instructions.s
 * Run simulator.py 
