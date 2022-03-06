@@ -408,6 +408,7 @@ while True:
         show_memory()
         print("Executed the file Successfully...")
         print("Total count: " + str(count))
+        exit()
     elif choice == 2:
         count = 0
         while True:  # keeps on running until we stop giving some number
@@ -423,8 +424,10 @@ while True:
                         exit("Sorry terminating the program due to unexpected error :(")
                     continue
                 else:
+                    print()
                     print("Executed the file Successfully...")
                     print(count)  # total count
+                    print()
             elif option == 2:
                 show_registers()
             elif option == 3:
@@ -448,4 +451,7 @@ while True:
     elif choice == 3:
         sys.exit("Exiting from the Program...")
     else:
-        print("\nUnexpected Error occurs, Enter again...\n")
+        print("\nUnexpected Error occurs, Enter again...")
+        print("\nPress 1 to RUN file")
+        print("Press 2 to RUN step by step")
+        print("Press 3 to Exit")
