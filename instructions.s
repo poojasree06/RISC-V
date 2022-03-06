@@ -1,7 +1,7 @@
 # bubble sort
 # slli,li addi,add,lui,beq,lw,sw,j
 .data
-	array: .word 0,-6,-5,9,10
+	array: .word 0,-6,5,9,-10
 .text
 	main:
 		lui s1,0x10010 #address of array
