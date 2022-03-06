@@ -1,34 +1,32 @@
-# Procedure:    bubbleSort
-# Objective:    sort an array of integer elements 
-# Input:        an address of an array of integers
-# Output:       sorted array
+# bubble sort
+# slli,li addi,add,lui,beq,lw,sw,j
 .data
-array:	.word 9,10,-4,-2
+	array: .word 0,-6,-5,9,10
 .text
-main:
-bubbleSort:
-lui     t0, 0x10010
-li      t1, 0     # i = 0;
-li      t2, 0      # j = 0;
-li      s1, 3      # array length
-loop:
-    beq     t1, s1, exit       # exit if i == length of array -1
-    lui     t0, 0x10010
-    li      t2, 0      # j = 0;
-    forLoop:
-        beq     t2, s1, exitForLoop   # exit loop if j==length of array -1
-        lw      a0, 0(t0)         # a0 = array[j]
-        lw      a1, 4(t0)         # a1 = array[j+1]
-        ble     a0, a1, update        # if array[j]<=array[j+1] skip
-        sw      a1, 0(t0)         # a[j+1] = a[j]
-        sw      a0, 4(t0)         # a[j] = a[j+1]
-        update:
-        addi   t2, t2, 1         # j++
-        #sll     $t3, $t2, 2         # t3 = j*4
-        addi    t0, t0, 4        #
-        j       forLoop
-    exitForLoop:
-        addi   t1, t1, 1  # i++;
-        j   loop
-exit:
-   
+	main:
+		lui s1,0x10010 #address of array
+		addi s2,s2,5  # size  change size according to array size in data part
+		addi s3,s3,0  #i=0
+		addi s5,s2,-1  #size-1
+		for1:
+		bge s3,s5,exit   # if(i>=size-1)
+		addi s4,t1,0     # j=0    #t1=0 
+		sub s6,s5,s3   #size-1-i 
+		for2:
+		bge s4,s6 ,end1  # if(j>=(size-i-1) go to for1  end
+		slli t2,s4,2   #s4<<2
+		add t3,s1,t2  # A+ j*4  base address
+		lw t4,0(t3)   # A[0]
+		lw t5,4(t3)    # A[4]
+		bgt t4,t5,swap
+		addi s4,s4,1   # j=j+1
+		j for2
+		end1: 
+		addi s3,s3,1   # i=i+1		
+		j for1       # jump to for1
+		swap:
+		sw t5,0(t3)   # a[0]=s[4]
+		sw t4,4(t3)  # a[4]=a[0]
+		addi s4,s4,1  # j=j+1
+		j for2
+		exit:
