@@ -1,10 +1,10 @@
 import re
 
-reg = {"zero":0, "r0":0, "at":0, "v0":0, "v1":0, "a0":0, "a1":0, "a2":0, "a3":0, "t0":0, "t1":0, "t2":0, "t3":0, "t4":0, "t5":0, "t6":0, "t7":0,"s0":0, "s1":0, "s2":0, "s3":0 ,"s4":0 ,"s5":0, "s6":0, "s7":0, "t8":0, "t9":0, "k0":0, "k1":0, "gp":0, "sp":0, "s8":0, "ra":0}
-reg_flag = {"zero":['',''], "r0":['',''], "at":['',''], "v0":['',''], "v1":['',''], "a0":['',''], "a1":['',''], "a2":['',''], "a3":['',''], "t0":['',''], "t1":['',''], "t2":['',''], "t3":['',''], "t4":['',''], "t5":['',''], "t6":['',''], "t7":['',''],"s0":['',''], "s1":['',''], "s2":['',''], "s3":['',''] ,"s4":['',''] ,"s5":['',''], "s6":['',''], "s7":['',''], "t8":['',''], "t9":['',''], "k0":['',''], "k1":['',''], "gp":['',''], "sp":['',''], "s8":['',''], "ra":['','']}
+reg =  {"zero": 0, "ra": 0, "sp": 0, "gp": 0, "tp": 0, "t0": 0, "t1": 0, "t2": 0, "s0": 0, "s1": 0, "a0": 0, "a1": 0, "a2": 0, "a3": 0, "a4": 0, "a5": 0, "a6": 0, "a7": 0, "s2": 0, "s3": 0, "s4": 0, "s5": 0, "s6": 0, "s7": 0, "s8": 0, "s9": 0, "s10": 0, "s11": 0, "t3": 0, "t4": 0, "t5": 0, "t6": 0}
+reg_flag = {"zero":['',''], "ra":['',''], "sp":['',''], "gp":['',''], "tp":['',''], "t0":['',''], "t1":['',''], "t2":['',''], "t3":['',''], "s0":['',''], "s1":['',''], "a0":['',''], "a1":['',''], "a2":['',''], "a3":['',''], "a4":['',''], "a5":['',''],"a6":['',''], "a7":['',''], "s2":['',''], "s3":['',''] ,"s4":['',''] ,"s5":['',''], "s6":['',''], "s7":['',''], "s8":['',''], "s9":['',''], "s10":['',''], "s11":['',''], "t3":['',''], "t4":['',''], "t5":['',''], "t6":['','']}
 base_address = 0x10010000
-data_and_text = {'data':[],'main':[]}
-data = {'.word':[],'.text':[]}
+data_and_text = {'data':[],'text':[]}
+data = {'.word':[]}
 label_address = {}
 main = {}
 PC = 0
@@ -27,88 +27,70 @@ latch_e = 0
 latch_m = 0
 
 ins_queue = []
+def all_instructions(file):
+    all_instructions = []
+    pattern = re.compile('\s*[,|\s+]\s*')
+    for line in file:
+        data = remove_comments(line).strip()
+        if len(data) != 0:
+            instruction = [x for x in pattern.split(data) if x]
+            all_instructions.append(instruction)
+    return all_instructions
 
-def fileHandler(filename):
 
-    file = open(filename,'r')
-    result = []
-    for line in file.readlines():
-        result.append(line)
-    return result
+def remove_comments(file):
+    return re.sub('#.*', '', file)
 
-def parse(text):
-    result = text.split()
-    parsed = []
+fileopen = open("instructions.s", "r+")
+instructionslist = all_instructions(fileopen)
 
-    for st in result:
+label = {'data': []}  # list containing data section labels
+# dictionary containing two lists data list and text list which contain respective instructions
+data_index = 0
+text_index = 0
 
-        st = st.split(",")
-        for x in st:
-            if(x):
-                parsed.append(x)
+for i in range(len(instructionslist)):
+    if instructionslist[i][0] == '.data':
+        data_index = i
+    elif instructionslist[i][0] == '.text':
+        text_index = i
 
-    return parsed
+for i in range(data_index + 1, text_index):
+    if (len(instructionslist[i]) > 1):
+        data_and_text['data'].append(instructionslist[i])
+    elif (len(instructionslist[i]) == 1):
+        label['data'].append(instructionslist[i])
 
-def read_instructions(instructions):
+for i in range(text_index + 1, len(instructionslist)):
+    if instructionslist[i][0] != 'main:':
+        data_and_text['text'].append(instructionslist[i])
 
-    parsed_list = []
-    for ins in instructions:
-        if(parse(ins)):
-            parsed_list.append(parse(ins))
+# count = 0
+# print(data_and_text['data'][0])
+for ins in data_and_text['data']:
+    if ins[0] == '.word':
+        for i in range(1, len(ins)):
+            data['.word'].append(int(ins[i]))
+    elif ins[1] == '.word':
+        for i in range(2, len(ins)):
+            data['.word'].append(int(ins[i]))
+        # count += 1
 
-    return parsed_list
+main = {}  # dictionary which contains labels as keys and corresponding numbers as values
+count = 0
 
-def ins_list(instructions,data_and_text,data,label_address,main):
-    
-    pos_data = 0
-    pos_main = 0
+for ins in data_and_text['text']:
+    if len(ins) == 1:  # label:
+        ins[0] = ins[0][:-1]  # label
+        main[ins[0]] = count  # main[label]=0  main={'label':0}
+    else:
+        count += 1
 
-    data_labels = []
+for ins in data_and_text['text']:
+    if ins[0] in main.keys():
+        data_and_text['text'].remove(ins)
 
-    for i in range(len(instructions)):
-        
-        if(instructions[i][0]=='.data'):
-            pos_data = i
-        elif(instructions[i][0]=='main:'):
-            pos_main = i
 
-    for i in range(pos_data+1,pos_main):
-
-        if(instructions[i][0]!='.text' and instructions[i][0]!='.globl'):
-            data_and_text['data'].append(instructions[i])
-
-    for i in range(pos_main+1,len(instructions)):
-        data_and_text['main'].append(instructions[i])
-
-    for dat in data_and_text['data']:
-        if(len(dat)==1):
-            data_labels.append(dat[0][:-1])
-
-    count = 0
-    label_count = 0
-
-    for ins in data_and_text['data']:
-        if(len(ins)==1):
-            label_address[data_labels[label_count]] = count
-            label_count+=1
-
-        if(ins[0]=='.word'):
-            for i in range(1,len(ins)):
-                data['.word'].append(int(ins[i]))
-                count+=1
-
-    count = 0
-
-    for ins in data_and_text['main']:
-        if(len(ins)==1):
-            ins[0] = ins[0][:-1]
-            main[ins[0]]=count
-        else:
-            count+=1
-
-    for ins in data_and_text['main']:
-        if(ins[0] in main.keys()):
-            data_and_text['main'].remove(ins)
 
 def stllflg1_t():
     global stall_flag1
@@ -192,7 +174,7 @@ def fetch():
     # print(bn_flag)
 
     if((instr[0] in ins_type1) or (instr[0] in ins_type2) or (instr[0] in ins_type6)):
-        regstr = instr[1].replace('$','')
+        regstr = instr[1]
 
         reg_flag[regstr][0] = 'f'
         reg_flag[regstr][1] = 'e'
@@ -201,7 +183,7 @@ def fetch():
 
 
     elif(instr[0]=='lw'):
-        regstr = instr[1].replace('$','')
+        regstr = instr[1]
 
         reg_flag[regstr][0] = 'f'
         reg_flag[regstr][1] = 'm'
@@ -213,8 +195,8 @@ def fetch():
         PC+=1
 
     elif(instr[0] in ins_type3):
-        reg1 = instr[1].replace('$','')
-        reg2 = instr[2].replace('$','')
+        reg1 = instr[1]
+        reg2 = instr[2]
         bnflg_t()
         print(reg_flag[reg1],reg1,reg_flag[reg2],reg2)
         if(reg_flag[reg1][0]=='d' and reg_flag[reg1][1]=='m'):
@@ -266,10 +248,10 @@ def decode(parsed_ins):
     # print(stall_flag2)
 
     if(parsed_ins[0]=='add' or parsed_ins[0]=='sub' or parsed_ins[0]=='and' or parsed_ins[0]=='or' or parsed_ins[0]=='slt'):
-        regstr = parsed_ins[1].replace('$','')
+        regstr = parsed_ins[1]
         
-        reg1 = parsed_ins[2].replace('$','')
-        reg2 = parsed_ins[3].replace('$','')
+        reg1 = parsed_ins[2]
+        reg2 = parsed_ins[3]
 
         if(reg_flag[reg1][0]=='e' and reg_flag[reg1][1]=='m'):
             stllflg2_t()
@@ -280,12 +262,12 @@ def decode(parsed_ins):
         print(reg_flag[regstr])
         print(stall_flag2)
 
-        return {'ins':parsed_ins[0],'rd':parsed_ins[1].replace('$',''),'rs':parsed_ins[2].replace('$',''),'rt':parsed_ins[3].replace('$','')}
+        return {'ins':parsed_ins[0],'rd':parsed_ins[1],'rs':parsed_ins[2],'rt':parsed_ins[3]}
     
     elif(parsed_ins[0]=='sll' or parsed_ins[0]=='srl' or parsed_ins[0]=='andi' or parsed_ins[0]=='ori' or parsed_ins[0]=='addi'):
-        regstr = parsed_ins[1].replace('$','')
+        regstr = parsed_ins[1]
 
-        reg1 = parsed_ins[2].replace('$','')
+        reg1 = parsed_ins[2]
 
         if(reg_flag[reg1][0]=='e' and reg_flag[reg1][1]=='m'):
             stllflg2_t()
@@ -294,11 +276,11 @@ def decode(parsed_ins):
         print(reg_flag[regstr])
         print(stall_flag2)
 
-        return {'ins':parsed_ins[0],'rd':parsed_ins[1].replace('$',''),'rs':parsed_ins[2].replace('$',''),'amt':parsed_ins[3]}
+        return {'ins':parsed_ins[0],'rd':parsed_ins[1],'rs':parsed_ins[2],'amt':parsed_ins[3]}
     
     elif(parsed_ins[0]=='bne' or parsed_ins[0]=='beq'):
-        rs = parsed_ins[1].replace('$','')
-        rt = parsed_ins[2].replace('$','')
+        rs = parsed_ins[1]
+        rt = parsed_ins[2]
         addr = parsed_ins[3]
         value1 = 0
         value2 = 0
@@ -331,7 +313,7 @@ def decode(parsed_ins):
             else:
                 PC = main[addr]
         
-        return {'ins':parsed_ins[0],'rs':parsed_ins[1].replace('$',''),'rt':parsed_ins[2].replace('$',''),'addr':parsed_ins[3]}
+        return {'ins':parsed_ins[0],'rs':parsed_ins[1],'rt':parsed_ins[2],'addr':parsed_ins[3]}
     
     elif(parsed_ins[0]=='j'):
         addr = parsed_ins[1]
@@ -339,12 +321,12 @@ def decode(parsed_ins):
         return {'ins':parsed_ins[0],'addr':parsed_ins[1]}
 
     elif(parsed_ins[0]=='lw' or parsed_ins[0]=='sw'):
-        regstr = parsed_ins[1].replace('$','')
+        regstr = parsed_ins[1]
 
         reg_pattern = re.search(r"\$[a-z0-9]*",parsed_ins[2],re.MULTILINE)
         offset_pattern = re.search(r"\w+",parsed_ins[2],re.MULTILINE)
 
-        reg1 = reg_pattern.group(0).replace('$','')
+        reg1 = reg_pattern.group(0)
         if(reg_flag[reg1][0]=='e' and reg_flag[reg1][1]=='m'):
             stllflg2_t()
 
@@ -352,13 +334,13 @@ def decode(parsed_ins):
             reg_flag[regstr][0]='d'
         print(reg_flag[regstr])
         print(stall_flag2)
-        return {'ins':parsed_ins[0],'rt':parsed_ins[1].replace('$',''),'rm':reg_pattern.group(0).replace('$',''),'offset':int(offset_pattern.group(0))}
+        return {'ins':parsed_ins[0],'rt':parsed_ins[1],'rm':reg_pattern.group(0),'offset':int(offset_pattern.group(0))}
 
     elif(parsed_ins[0]=='lui'):
-        regstr = parsed_ins[1].replace('$','')
+        regstr = parsed_ins[1]
         reg_flag[regstr][0]='d'
         print(reg_flag[regstr])
-        return {'ins':parsed_ins[0],'rd':parsed_ins[1].replace('$',''),'addr':hex(int(parsed_ins[2]+'0000',16))}
+        return {'ins':parsed_ins[0],'rd':parsed_ins[1],'addr':hex(int(parsed_ins[2]+'0000',16))}
 
     elif(parsed_ins[0]=='jr'):
         return {'ins':parsed_ins[0]}
