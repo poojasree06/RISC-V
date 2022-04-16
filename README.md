@@ -41,10 +41,10 @@
 * There are five pipleine stages in the developed Simulator.
 ```    Instruction Fetch(IF) --> Fetches Instruction from the memory
 >      Instruction Fetch(IF) --> Fetches Instruction from the memory
->        Register Decode(RF) --> Decodes the Instructions   --? 
+>        Register Decode(RD) --> Decodes the Instructions   --? 
 > Arithematic Logic unit(EX) --> Performs Arithematic and Logical Calculations
 >                Memory(MEM) -->
 >             Write Back(WB) --> Writes Back to the Memory
  ```
 * Data forwarding was used to get rid of data dependencies. Data Forwards from the MEM and WB stages to the EX stage.
-* The branch prediction has not been implemented.A stall was implemented whenever a branch existed.
+* The branch prediction has not been implemented. A stall was implemented whenever a branch existed.
