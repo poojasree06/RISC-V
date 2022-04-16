@@ -35,5 +35,15 @@
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # PHASE-2
-* Run file main.py present in phase_2 folder.
 * 
+* Run file main.py present in phase_2 folder.
+* The program executes all the instrutions and display the pipeline stages of each instruction ,number of stalls, IPC(Intructions per Cycle).
+* After executing all of the instructions, it also displays the registers and memory states(developed in Phase-1).
+* There are five pipleine stages in the developed Simulator.
+```Instruction Fetch(IF) --> Fetches Instruction from the memory
+>  Instruction Fetch(IF) --> Fetches Instruction from the memory
+>      Register Decode(RF) --> Decodes the Instructions   --? 
+>     Arithematic Logic unit(EX) --> Performs Arithematic and Logical Calculations
+>      Memory(MEM) -->
+>        Write Back(WB) --> Writes Back to the Memory
+ ```
