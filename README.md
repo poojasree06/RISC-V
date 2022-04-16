@@ -35,7 +35,6 @@
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # PHASE-2
-* 
 * Run file main.py present in phase_2 folder.
 * The program executes all the instrutions and display the pipeline stages of each instruction ,number of stalls, IPC(Intructions per Cycle).
 * After executing all of the instructions, it also displays the registers and memory states(developed in Phase-1).
