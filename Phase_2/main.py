@@ -1,7 +1,6 @@
 import re
 import simulator
-# import pandas as pd
-# import openpyxl
+
 
 reg = {"zero": 0, "ra": 0, "sp": 0, "gp": 0, "tp": 0, "t0": 0, "t1": 0, "t2": 0, "s0": 0, "s1": 0, "a0": 0, "a1": 0,
        "a2": 0, "a3": 0, "a4": 0, "a5": 0, "a6": 0, "a7": 0, "s2": 0, "s3": 0, "s4": 0, "s5": 0, "s6": 0, "s7": 0,
@@ -17,7 +16,7 @@ reg_flag = {"zero": ['', ''], "ra": ['', ''], "sp": ['', ''], "gp": ['', ''], "t
 
 base_address = 0x10010000
 data_and_text = {'data': [], 'main': []}
-data = {'.word': [], '.text': []}   #text -->not used
+data = {'.word': [], '.text': []}   
 label_address = {}
 main = {}
 PC = 0
@@ -165,31 +164,6 @@ def bnflg_f():
     bn_flag = False
 
 
-# def print_stages(lst):
-#     flag = False
-#     mark = 1
-#     for i in range(5,len(lst)):
-#         if(flag==False):
-#             if(lst[i][0]!='w'):
-#                 for _ in range(mark):
-#                     lst[i].insert(0,' ')
-#                 flag = True
-#             else:
-#                 for _ in range(mark):
-#                     lst[i].insert(0,' ')
-#                 mark+=1
-#         else:
-#             if(lst[i][0]=='w'):
-#                 flag = False
-#             for _ in range(mark):
-#                 lst[i].insert(0," ")
-#             mark+=1
-
-#     cols = []
-#     for i in range(54):
-#         cols.append('c'+str(i+1))
-#     df = pd.DataFrame(lst,columns=cols)
-#     df.to_excel('new_new_cycles.xlsx',header=False,index=False)
 
 def fetch():
     global PC
