@@ -823,6 +823,7 @@ def Simulate():
     c = "EXECUTE"
     d = "MEMORY"
     e = "WRITEBACK"
+    simulator.process_simulate()
     for i in range(162):
         print('-', end="")
     print()
@@ -843,27 +844,23 @@ def Simulate():
     for i in range(162):
         print('-', end="")
     print()
-    print("Do you want to enable Data Forwarding(y/n): ")
+    print("press 1 to get stalls with Data Forwarding press 2 to get stalls without Data Forwarding: ")
     choice = input()
-    if (choice == "y" or choice == "Y"):
-        print("Total Clock Cycles: ", process[1]+4)
+    if (choice == "1"):
+        print("Total Clock Cycles: ", process[1]+4+stalls)
         # print_stages(process[0])
        # print(process[0])
         print("Stalls with Data Forwading: ", stalls)
-        print("IPC: ", ((process[1]+4)/ (stalls)) ** -1)
+        print("IPC: ", ((process[1]+4+stalls)/ (stalls)) ** -1)
         print("\nInstructions for which Stalls are implemented: ")
         for i in range(len(process[2])):
             print(process[2][i])
         print()
+        simulator.show_registers()
+        simulator.show_memory()
+
     else:
         print("Stalls without Data Forwading: ",stalls_N )
 
-simulator.process_simulate()
-
-
 Simulate()
-simulator.show_registers()
-simulator.show_memory()
 print("Executed the file Successfully...")
-
-
