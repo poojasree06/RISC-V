@@ -1,11 +1,9 @@
 import re
 import simulator
 
-
 reg = {"zero": 0, "ra": 0, "sp": 0, "gp": 0, "tp": 0, "t0": 0, "t1": 0, "t2": 0, "s0": 0, "s1": 0, "a0": 0, "a1": 0,
        "a2": 0, "a3": 0, "a4": 0, "a5": 0, "a6": 0, "a7": 0, "s2": 0, "s3": 0, "s4": 0, "s5": 0, "s6": 0, "s7": 0,
        "s8": 0, "s9": 0, "s10": 0, "s11": 0, "t3": 0, "t4": 0, "t5": 0, "t6": 0}
-
 
 reg_flag = {"zero": ['', ''], "ra": ['', ''], "sp": ['', ''], "gp": ['', ''], "tp": ['', ''], "t0": ['', ''],
             "t1": ['', ''], "t2": ['', ''], "s0": ['', ''], "s1": ['', ''], "a0": ['', ''],
@@ -16,11 +14,13 @@ reg_flag = {"zero": ['', ''], "ra": ['', ''], "sp": ['', ''], "gp": ['', ''], "t
 
 base_address = 0x10010000
 data_and_text = {'data': [], 'main': []}
-data = {'.word': [], '.text': []}   
+data = {'.word': [], '.text': []}   #text -->not used
 label_address = {}
 main = {}
 PC = 0
 stalls = 0
+stalls_N = 0
+
 stall_flag1 = False
 stall_flag2 = False
 stall_flag3 = False
@@ -39,7 +39,7 @@ latch_e = 0
 latch_m = 0
 
 ins_queue = []
-
+inst_stalls_N=[]
 
 def fileHandler(filename):
     file = open(filename, 'r')
@@ -163,8 +163,6 @@ def bnflg_f():
 
     bn_flag = False
 
-
-
 def fetch():
     global PC
     global reg_flag
@@ -211,7 +209,6 @@ def fetch():
 
         elif (reg_flag[reg2][0] == 'e' and reg_flag[reg2][1] == 'm'):
             # take value from latch_m
-            # print('hell')
             stllflg1_t()
 
         elif (reg_flag[reg1][0] == 'd' and reg_flag[reg1][1] == 'e'):
@@ -224,7 +221,6 @@ def fetch():
 
     elif (instr[0] in ins_type5):
         bnflg_t()
-        # print(PC)
     return instr
 
 
@@ -233,11 +229,11 @@ def decode(parsed_ins):
     global PC
     global reg_flag
     global stall_flag2
+    global stalls_N
 
     if (parsed_ins[0] == 'add' or parsed_ins[0] == 'sub' or parsed_ins[0] == 'and' or parsed_ins[0] == 'or' or
             parsed_ins[0] == 'slt'):
         regstr = parsed_ins[1]
-
         reg1 = parsed_ins[2]
         reg2 = parsed_ins[3]
 
@@ -274,15 +270,19 @@ def decode(parsed_ins):
         # print(reg_flag[rs],reg_flag[rt])
         if (reg_flag[rs][0] == 'w'):
             value1 = latch_m
+            stalls_N+=1
         elif (reg_flag[rs][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         else:
             value1 = reg[rs]
 
         if (reg_flag[rt][0] == 'w'):
             value2 = latch_m
+            stalls_N += 1
         elif (reg_flag[rt][0] == 'm'):
             value2 = latch_e
+            stalls_N += 1
         else:
             value2 = reg[rt]
 
@@ -347,7 +347,8 @@ def decode(parsed_ins):
 
 
 def execute(decoded_ins):
-    global reg_flag
+    global reg_flag, stalls_N
+    global inst_stalls_N
     global reg
 
     if (decoded_ins['ins'] == 'add'):
@@ -358,8 +359,12 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
+            inst_stalls_N.append(decoded_ins)
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
+            inst_stalls_N.append(decoded_ins)
         # directly using value
         else:
             value1 = reg[reg1]
@@ -367,8 +372,11 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg2][0] == 'm'):
             value2 = latch_e
+            stalls_N += 1
+            inst_stalls_N.append(decoded_ins)
         elif (reg_flag[reg2][0] == 'w'):
             value2 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value2 = reg[reg2]
@@ -394,8 +402,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -403,8 +413,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg2][0] == 'm'):
             value2 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg2][0] == 'w'):
             value2 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value2 = reg[reg2]
@@ -428,8 +440,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -437,8 +451,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg2][0] == 'm'):
             value2 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg2][0] == 'w'):
             value2 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value2 = reg[reg2]
@@ -453,8 +469,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -462,8 +480,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg2][0] == 'm'):
             value2 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg2][0] == 'w'):
             value2 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value2 = reg[reg2]
@@ -479,8 +499,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -488,8 +510,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg2][0] == 'm'):
             value2 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg2][0] == 'w'):
             value2 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value2 = reg[reg2]
@@ -513,8 +537,10 @@ def execute(decoded_ins):
         # forwarding value if already in use
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -537,8 +563,10 @@ def execute(decoded_ins):
         value2 = 0
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -556,8 +584,10 @@ def execute(decoded_ins):
         reg1 = decoded_ins['rs']
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -571,8 +601,10 @@ def execute(decoded_ins):
         value2 = 0
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -587,8 +619,10 @@ def execute(decoded_ins):
         reg1 = decoded_ins['rs']
         if (reg_flag[reg1][0] == 'm'):
             value1 = latch_e
+            stalls_N += 1
         elif (reg_flag[reg1][0] == 'w'):
             value1 = latch_m
+            stalls_N += 1
         # directly using value
         else:
             value1 = reg[reg1]
@@ -607,7 +641,7 @@ def execute(decoded_ins):
 
 
 def memory(execute):
-    global reg_flag
+    global reg_flag, stalls_N
     global data
     global reg
   #  print(execute)
@@ -622,6 +656,7 @@ def memory(execute):
                 reg1 = execute[1]['rt']
                 if (reg_flag[reg1][0] == 'w'):
                     value = latch_m
+                    stalls_N += 1
                 else:
                     value = reg[reg1]
 
@@ -659,7 +694,7 @@ def writeback(result):
 
 def pipeline(ins):   # data forwarding enabled
 
-    global PC
+    global PC, stalls_N
     global stall_flag1
     global stall_flag2
     global stall_flag3
@@ -669,7 +704,7 @@ def pipeline(ins):   # data forwarding enabled
     global latch_d
     global latch_e
     global latch_m
-
+    inst=[]
     f = []
     d = {}
     e = ()
@@ -686,6 +721,7 @@ def pipeline(ins):   # data forwarding enabled
         # writeback cycle
         if (m):
             w = writeback(m)
+
             if (w):
                 reg_flag[w] = ['', '']
             result[cycles].append('w')
@@ -701,6 +737,8 @@ def pipeline(ins):   # data forwarding enabled
         if (stall_flag2 == True):
             e = ()
             stalls += 1
+            inst.append(ins[PC])
+            stalls_N += 1
             stllflg2_f()
             result[cycles].append('s')
             result[cycles].append('s')
@@ -716,21 +754,26 @@ def pipeline(ins):   # data forwarding enabled
             e = ()
         # decode cycle
         if (stall_flag1 == True):
+            inst.append(ins[PC])
             d = {}
             stalls += 1
+            stalls_N += 1
             stllflg1_f()
             result[cycles].append('s')
             result[cycles].append('s')
             continue
         elif (stall_flag3 == True):
+            inst.append(ins[PC])
             if (count == 0):
                 d = {}
                 stalls += 1
+                stalls_N += 1
                 count += 1
                 result[cycles].append('s')
                 result[cycles].append('s')
             elif (count == 1):
                 stalls += 1
+                stalls_N += 1
                 count = 0
                 result[cycles].append('s')
                 stllflg3_f()
@@ -743,8 +786,11 @@ def pipeline(ins):   # data forwarding enabled
             d = {}
         # fetch cycle
         if (bn_flag == True):
+            if(PC!=len(ins)):
+                inst.append(ins[PC])
             f = []
             stalls += 1
+            stalls_N += 1
             result[cycles].append('s')
             bnflg_f()
             continue
@@ -764,25 +810,24 @@ def pipeline(ins):   # data forwarding enabled
         print(d1.center(25), end="|")
         print(e1.center(10), end="|")
         print()
-    return (result, cycles)
+    return (result, cycles, inst)
 
 
 def Simulate():
-    global stalls
-
+    global stalls,stalls_N
     instructions = all_instructions(fileHandler("bubble_sort.s"))
     ins_list(instructions, data_and_text, data, label_address, main)
-    cycle="CYCLE"
+    cycle = "CYCLE"
     a = "FETCH"
     b = "DECODE"
     c = "EXECUTE"
     d = "MEMORY"
     e = "WRITEBACK"
     for i in range(162):
-        print('-',end="")
+        print('-', end="")
     print()
     print("", end="|")
-    print(cycle.center(10),end="|")
+    print(cycle.center(10), end="|")
     print(a.center(30), end="|")
     print(b.center(55), end="|")
     print(c.center(25), end="|")
@@ -790,22 +835,35 @@ def Simulate():
     print(e.center(10), end="|")
     print()
     for i in range(162):
-        print('-',end="")
+        print('-', end="")
     print()
     process = ()
     instruction = data_and_text['main']
     process = pipeline(instruction)
     for i in range(162):
-        print('-',end="")
+        print('-', end="")
     print()
-    print(process[1])
-    # print_stages(process[0])
-    print(stalls)
-
+    print("Do you want to enable Data Forwarding(y/n): ")
+    choice = input()
+    if (choice == "y" or choice == "Y"):
+        print("Total Clock Cycles: ", process[1]+4)
+        # print_stages(process[0])
+       # print(process[0])
+        print("Stalls with Data Forwading: ", stalls)
+        print("IPC: ", ((process[1]+4)/ (stalls)) ** -1)
+        print("\nInstructions for which Stalls are implemented: ")
+        for i in range(len(process[2])):
+            print(process[2][i])
+        print()
+    else:
+        print("Stalls without Data Forwading: ",stalls_N )
 
 simulator.process_simulate()
+
+
 Simulate()
 simulator.show_registers()
 simulator.show_memory()
 print("Executed the file Successfully...")
+
 
